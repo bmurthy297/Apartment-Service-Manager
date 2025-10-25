@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex">
+  <h3 class="me-auto">Dashboard ({{ role }})</h3>
+  <div>
+    <span class="me-2">Hi, {{ username }}</span>
+    <a href="{{ url_for('create_request') }}" class="btn btn-success btn-sm">Create Request</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Logout</a>
+  </div>
+</div>
+
+<table class="table mt-3">
+  <thead><tr><th>ID</th><th>Issue</th><th>Priority</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for req in requests %}
+    <tr>
+      <td>{{ req.id }}</td>
+      <td>{{ req.issue_type }}<div class="text-muted">{{ req.description[:80] }}{% if req.description|length > 80 %}...{% endif %}</div></td>
+      <td>{{ req.priority }}</td>
+      <td>{{ req.status }}</td>
+      <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>
+        {% if role == 'admin' %}
+          <form method="post" action="{{ url_for('update_status', req_id=req.id) }}">
+            <select name="status" class="form-select form-select-sm">
+              <option {% if req.status=='Open' %}selected{% endif %}>Open</option>
+              <option {% if req.status=='In Progress' %}selected{% endif %}>In Progress</option>
+              <option {% if req.status=='Completed' %}selected{% endif %}>Completed</option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary mt-1">Update</button>
+          </form>
+        {% else %}
+          ---
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
